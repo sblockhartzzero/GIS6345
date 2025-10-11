@@ -12,7 +12,8 @@ from shapely.geometry import shape
 import geopandas as gpd
 import pandas as pd
 from datetime import datetime
-
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Specify fullpath to input shapefile
 # i.e. shapefile downloaded from movebank.org
@@ -58,8 +59,42 @@ for k in range(len(df_subset)):
     datetime_string = df_subset.loc[k,"timestamp"]
     df_subset.loc[k,"timestamp_datetime"] = datetime.strptime(datetime_string,format_string)
 #endfor
-print(df_subset.head())    
+print(df_subset.head())
 
+# group by individual-local-identifier
+grouped_series = df_subset.groupby('individual-local-identifier').describe()
+
+# Print timestamp_datetime min, max
+print(grouped_series['timestamp_datetime']['min'])
+print(grouped_series['timestamp_datetime']['max'])
+
+# Print location-lat min, max
+print(grouped_series['location-lat']['min'])
+print(grouped_series['location-lat']['max'])
+  
+# Print location-long min, max
+print(grouped_series['location-long']['min'])
+print(grouped_series['location-long']['max'])
+
+# Is time of interest in data range of track?
+datetime_of_interest = datetime(2016, 3, 15)
+is_datetime_of_interest_in_range = (grouped_series['timestamp_datetime']['min']<datetime_of_interest)&(grouped_series['timestamp_datetime']['max']>datetime_of_interest)
+print(grouped_series[is_datetime_of_interest_in_range])
+
+# Two tags look good i.e. include 3/15/2016: GmTag137 and GmTag142
+df_subset[df_subset['individual-local-identifier']=='GmTag137'].describe()
+df_subset[df_subset['individual-local-identifier']=='GmTag142'].describe()
+
+# Let's look at one of these tracks:
+tag_id = 'GmTag142'
+myTrack = df_subset[df_subset['individual-local-identifier']==tag_id]
+df_lat = myTrack['location-lat']
+df_lon = myTrack['location-long']
+lat_array = np.array(df_lat)
+lon_array = np.array(df_lon)
+
+plt.plot(lon_array,lat_array)
+    
 
 
     
