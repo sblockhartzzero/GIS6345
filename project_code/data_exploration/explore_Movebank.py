@@ -4,7 +4,6 @@ Created on Thu Oct  9 16:24:43 2025
 
 @author: s44ba
 
-Explore shapefile downloaded from movebank.org
 """
 # Imports
 import fiona
@@ -14,7 +13,11 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
+"""
+Explore shapefile downloaded from movebank.org
+"""
 # Specify fullpath to input shapefile
 # i.e. shapefile downloaded from movebank.org
 input_shp = 'C:/Users/s44ba/git/GIS6345/project_data/track_data/Short_finned_pilot_whales_CRC_NW_Atlantic/lines.shp'
@@ -38,8 +41,10 @@ input_gdf = gpd.read_file(input_shp)
 # Preview
 print(input_gdf.head())
 
-# Since shapefile does not contain timestamps, use csv instead, starting
-# with a pandas dataframe
+"""
+Since shapefile does not contain timestamps, use csv instead, starting
+with a pandas dataframe
+"""
 
 # Specify fullpath to csv
 # i.e. csv downloaded from movebank.org
@@ -61,6 +66,9 @@ for k in range(len(df_subset)):
 #endfor
 print(df_subset.head())
 
+"""
+Explore by group by tag id and describe
+"""
 # group by individual-local-identifier
 grouped_series = df_subset.groupby('individual-local-identifier').describe()
 
@@ -85,18 +93,59 @@ print(grouped_series[is_datetime_of_interest_in_range])
 df_subset[df_subset['individual-local-identifier']=='GmTag137'].describe()
 df_subset[df_subset['individual-local-identifier']=='GmTag142'].describe()
 
+"""
+Inspect a single track
+"""
 # Let's look at one of these tracks:
 tag_id = 'GmTag142'
 myTrack = df_subset[df_subset['individual-local-identifier']==tag_id]
-df_lat = myTrack['location-lat']
-df_lon = myTrack['location-long']
+
+# Subset in time
+myTrack_in_time_window = myTrack['timestamp_datetime']<datetime(2016,1,1)
+myTrack_subset = myTrack[myTrack_in_time_window]
+
+# Extract arrays 
+df_lat = myTrack_subset['location-lat']
+df_lon = myTrack_subset['location-long']
+df_timestamp_datetime = myTrack_subset['timestamp_datetime']
+
+# Convert to numpy
 lat_array = np.array(df_lat)
 lon_array = np.array(df_lon)
+timestamp_datetime_array = np.array(df_timestamp_datetime)
 
-plt.plot(lon_array,lat_array)
+ax1 = plt.plot(lon_array,lat_array)
+
+"""
+Try animating via matplotlib animation
+"""
+fig2, ax2 = plt.subplots()
+line2, = ax2.plot(lon_array[0],lat_array[0],'r-')  # Initialize plot
+ax2.set(xlim=[-75.0, -73.0],ylim=[35.25, 38.0])
+plt.show()
+
+def update(frame_num):
+    x = lon_array[:frame_num]
+    y = lat_array[:frame_num]
+    line2.set_data(x,y)
+    return line2
     
+ani = FuncAnimation(fig=fig2, func=update, frames=400, interval=40)
+ani.save('GmTag142.mp4')
+plt.show()
 
 
+"""
+Experiment with clipping
+Shows multiple periods in ROI
+# Clip to region of interest
+myTrack_in_ROI = (df_subset['location-long']>-75.7)&(df_subset['location-long']>-74.4)&(df_subset['location-lat']>34.2)&(df_subset['location-lat']<35.8)
+myTrack_clipped = df_subset[myTrack_in_ROI]
+
+# Convert to numpy arrays
+df_lat = myTrack_clipped['location-lat']
+df_lon = myTrack_clipped['location-long']
+"""
     
     
 
