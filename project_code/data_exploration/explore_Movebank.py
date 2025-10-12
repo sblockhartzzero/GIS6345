@@ -120,19 +120,24 @@ ax1 = plt.plot(lon_array,lat_array)
 Try animating via matplotlib animation
 """
 fig2, ax2 = plt.subplots()
-line2, = ax2.plot(lon_array[0],lat_array[0],'r-')  # Initialize plot
+line1, = ax2.plot(lon_array,lat_array,'-',color = 'gray')  # Initialize plot
+line2, = ax2.plot(lon_array[0],lat_array[0],'ro-',markersize=7)  # Initialize plot
 ax2.set(xlim=[-75.0, -73.0],ylim=[35.25, 38.0])
 plt.show()
 
 def update(frame_num):
-    x = lon_array[:frame_num]
-    y = lat_array[:frame_num]
+    x = lon_array[frame_num-1:frame_num]
+    y = lat_array[frame_num-1:frame_num]
     line2.set_data(x,y)
     return line2
-    
-ani = FuncAnimation(fig=fig2, func=update, frames=400, interval=40)
+
+# Call to animate, where interval is msec between frames    
+ani = FuncAnimation(fig=fig2, func=update, frames=400, interval=120)
 ani.save('GmTag142.mp4')
 plt.show()
+
+# print min and max timestamp during this period
+print("Time from ",df_timestamp_datetime.min()," to ",df_timestamp_datetime.max())
 
 
 """
