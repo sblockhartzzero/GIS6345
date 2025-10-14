@@ -21,7 +21,7 @@ from matplotlib import cm
 def get_SST_from_HYCOM_TS(netcdf_fullpath):
     # Open netcdf file
     ds_loaded = netCDF4.Dataset(netcdf_fullpath)
-    print(ds_loaded.variables.keys())
+    #print(ds_loaded.variables.keys())
     
     # Unpack
     lon = ds_loaded.variables['lon'][:]
@@ -36,7 +36,7 @@ def get_SST_from_HYCOM_TS(netcdf_fullpath):
     
     # Use only the surface temperature (i.e. depth index 0)
     SST_array = T_array[0,:,:]   # [lat,lon]
-    print("Shape of SST_array is ",np.shape(SST_array))
+    #print("Shape of SST_array is ",np.shape(SST_array))
     
     # Return
     return lon_array,lat_array,SST_array
@@ -44,7 +44,7 @@ def get_SST_from_HYCOM_TS(netcdf_fullpath):
 def get_uv_from_HYCOM_UV(netcdf_fullpath):
     # Open netcdf file
     ds_loaded = netCDF4.Dataset(netcdf_fullpath)
-    print(ds_loaded.variables.keys())
+    #print(ds_loaded.variables.keys())
     
     # Unpack
     lon = ds_loaded.variables['lon'][:]
@@ -61,9 +61,9 @@ def get_uv_from_HYCOM_UV(netcdf_fullpath):
     
     # Use only the surface velocity (i.e. depth index 0)
     surface_u_array = water_u_array[0,:,:]   # [lat,lon]
-    print("Shape of surface_u_array is ",np.shape(surface_u_array))
+    #print("Shape of surface_u_array is ",np.shape(surface_u_array))
     surface_v_array = water_v_array[0,:,:]   # [lat,lon]
-    print("Shape of surface_v_array is ",np.shape(surface_v_array))
+    #print("Shape of surface_v_array is ",np.shape(surface_v_array))
     
     # Return
     return lon_array,lat_array,surface_u_array,surface_v_array
@@ -76,11 +76,11 @@ def plot_HYCOM_TS(netcdf_fullpath):
     
     # Plot
     fig, ax = plt.subplots()
-    cs = ax.contourf(lon_array,lat_array,SST_array[0,:,:],levels=15,cmap=cm.PuBu_r)
-    cbar = fig.colorbar(cs)
+    contourf_plot = ax.contourf(lon_array,lat_array,SST_array[0,:,:],levels=15,cmap=cm.PuBu_r)
+    cbar = fig.colorbar(contourf_plot)
     plt.show()
 
-    return lon_array,lat_array,SST_array
+    return
   
 
 def plot_HYCOM_UV(netcdf_fullpath):
@@ -91,11 +91,11 @@ def plot_HYCOM_UV(netcdf_fullpath):
     # Plot
     fig1, ax1 = plt.subplots()
     ax1.set_title('Arrows scale with plot width, not view')
-    Q = ax1.quiver(lon_array, lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width')
-    qk = ax1.quiverkey(Q, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',
+    quiver_plot = ax1.quiver(lon_array, lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width')
+    qk = ax1.quiverkey(quiver_plot, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',
                    coordinates='figure')
 
-    return lon_array,lat_array,surface_u_array,surface_v_array  
+    return
 
 
 def plot_HYCOM_TS_and_UV(ts_netcdf_fullpath, uv_netcdf_fullpath):
@@ -111,13 +111,15 @@ def plot_HYCOM_TS_and_UV(ts_netcdf_fullpath, uv_netcdf_fullpath):
     fig, ax = plt.subplots()
     ax.set_title('SST and surface velocity')
     # countorf of SST
-    cs = ax.contourf(ts_lon_array,ts_lat_array,SST_array[0,:,:],levels=12,cmap=cm.PuBu_r)
-    cbar = fig.colorbar(cs)
+    contourf_plot = ax.contourf(ts_lon_array,ts_lat_array,SST_array[0,:,:],levels=12,cmap=cm.PuBu_r)
+    cbar = fig.colorbar(contourf_plot)
     # quiver of surface velocity vectors
-    Q = ax.quiver(uv_lon_array, uv_lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width')
-    qk = ax.quiverkey(Q, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',
+    quiver_plot = ax.quiver(uv_lon_array, uv_lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width')
+    qk = ax.quiverkey(quiver_plot, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',
                    coordinates='figure')
     plt.show()
+    
+    return
     
     
 

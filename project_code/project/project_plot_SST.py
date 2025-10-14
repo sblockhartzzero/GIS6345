@@ -17,7 +17,7 @@ netcdf_fullpath = netcdf_folder+netcdf_filename
 print("netcdf_fullpath = ",netcdf_fullpath)
 
 # Call function to plot sea surface temperature from this netCDF file
-(lon_array,lat_array,SST_array) = project_functions.plot_HYCOM_TS(netcdf_fullpath)
+project_functions.plot_HYCOM_TS(netcdf_fullpath)
 
 
 
