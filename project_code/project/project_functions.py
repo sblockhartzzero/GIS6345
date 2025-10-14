@@ -18,7 +18,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-def get_SST_from_HYCOM_TS(netcdf_fullpath):
+def get_HYCOM_TS_fullpath(timestamp_datetime):
+    # Fudge for now
+    ts_netcdf_folder= 'C:/Users/s44ba/git/GIS6345/project_data/env_data/CapeHatteras/hycom_TS_CapeHatteras/'
+    ts_netcdf_filename = 'hycom_glby_930_2019030712_t003_ts3z.nc'
+    ts_netcdf_fullpath = ts_netcdf_folder+ts_netcdf_filename 
+    return ts_netcdf_fullpath
+
+def get_HYCOM_UV_fullpath(timestamp_datetime):
+    # Fudge for now
+    uv_netcdf_folder= 'C:/Users/s44ba/git/GIS6345/project_data/env_data/CapeHatteras/hycom_UV_CapeHatteras/'
+    uv_netcdf_filename = 'hycom_glby_930_2019030712_t003_uv3z.nc'
+    uv_netcdf_fullpath = uv_netcdf_folder+uv_netcdf_filename
+    return uv_netcdf_fullpath
+
+def get_SST_from_HYCOM_netcdf(netcdf_fullpath):
     # Open netcdf file
     ds_loaded = netCDF4.Dataset(netcdf_fullpath)
     #print(ds_loaded.variables.keys())
@@ -41,7 +55,7 @@ def get_SST_from_HYCOM_TS(netcdf_fullpath):
     # Return
     return lon_array,lat_array,SST_array
     
-def get_uv_from_HYCOM_UV(netcdf_fullpath):
+def get_uv_from_HYCOM_netcdf(netcdf_fullpath):
     # Open netcdf file
     ds_loaded = netCDF4.Dataset(netcdf_fullpath)
     #print(ds_loaded.variables.keys())
@@ -71,8 +85,8 @@ def get_uv_from_HYCOM_UV(netcdf_fullpath):
     
 def plot_HYCOM_TS(netcdf_fullpath):
     
-    # Call get_SST_from_HYCOM_TS
-    lon_array,lat_array,SST_array = get_SST_from_HYCOM_TS(netcdf_fullpath)
+    # Call get_SST_from_HYCOM_netcdf
+    lon_array,lat_array,SST_array = get_SST_from_HYCOM_netcdf(netcdf_fullpath)
     
     # Plot
     fig, ax = plt.subplots()
@@ -85,8 +99,8 @@ def plot_HYCOM_TS(netcdf_fullpath):
 
 def plot_HYCOM_UV(netcdf_fullpath):
     
-    # Call get_uv_from_HYCOM_UV
-    lon_array,lat_array,surface_u_array,surface_v_array = get_uv_from_HYCOM_UV(netcdf_fullpath)
+    # Call get_uv_from_HYCOM_netcdf
+    lon_array,lat_array,surface_u_array,surface_v_array = get_uv_from_HYCOM_netcdf(netcdf_fullpath)
     
     # Plot
     fig1, ax1 = plt.subplots()
@@ -100,11 +114,11 @@ def plot_HYCOM_UV(netcdf_fullpath):
 
 def plot_HYCOM_TS_and_UV(ts_netcdf_fullpath, uv_netcdf_fullpath):
     
-    # Call get_SST_from_HYCOM_TS
-    ts_lon_array,ts_lat_array,SST_array = get_SST_from_HYCOM_TS(ts_netcdf_fullpath)
+    # Call get_SST_from_HYCOM_netcdf
+    ts_lon_array,ts_lat_array,SST_array = get_SST_from_HYCOM_netcdf(ts_netcdf_fullpath)
     
-    # Call get_uv_from_HYCOM_UV
-    uv_lon_array,uv_lat_array,surface_u_array,surface_v_array = get_uv_from_HYCOM_UV(uv_netcdf_fullpath)
+    # Call get_uv_from_HYCOM_netcdf
+    uv_lon_array,uv_lat_array,surface_u_array,surface_v_array = get_uv_from_HYCOM_netcdf(uv_netcdf_fullpath)
     
     # Plot with overlay
     # Plot
