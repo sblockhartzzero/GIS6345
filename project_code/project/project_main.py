@@ -72,18 +72,24 @@ ax1.plot(lon_array,lat_array)
 
 # Plot track with overlays of oceanographic data
 # Get fullpath for the nearest (in time) HYCOM TS netcdf file
-ts_netcdf_fullpath = project_functions.get_HYCOM_TS_fullpath(timestamp_datetime_array[0]) 
+# Noteuse of .item() to convert numpy datetime back to datetime.datetime
+ts_netcdf_fullpath = project_functions.get_HYCOM_TS_fullpath(timestamp_datetime_array[0].item()) 
 # Get data for sea-surface temperature (SST) contour plot
 ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST_from_HYCOM_netcdf(ts_netcdf_fullpath)
 # Get fullpath for the nearest (in time) HYCOM uv netcdf file
-uv_netcdf_fullpath = project_functions.get_HYCOM_UV_fullpath(timestamp_datetime_array[0])
+uv_netcdf_fullpath = project_functions.get_HYCOM_UV_fullpath(timestamp_datetime_array[0].item())
 # Get data for  the sea-surface velocity quiver plot
 uv_lon_array,uv_lat_array,surface_u_array,surface_v_array = project_functions.get_uv_from_HYCOM_netcdf(uv_netcdf_fullpath)
 # Plot track with overlays 
 fig2, ax2 = plt.subplots()
-line1, = ax2.plot(lon_array,lat_array,'-',color = 'gray')        # Track
+# Set plot title
+title_string = tag_id+' '+timestamp_datetime_array[0].item().strftime("%Y-%m-%d")
+ax2.set_title(title_string)
+line1, = ax2.plot(lon_array,lat_array,'-',color = 'gray',alpha=0.5)        # Track
 line2, = ax2.plot(lon_array[0],lat_array[0],'ro-',markersize=7)  # Position along track
-cont = ax2.contourf(ts_lon_array,ts_lat_array,SST_array[0,:,:],levels=15,cmap=cm.PuBu_r)  # Contour SST
+custom_levels = np.linspace(12,30,num=25)
+cont = ax2.contourf(ts_lon_array,ts_lat_array,SST_array[0,:,:],levels=custom_levels,cmap=cm.jet)  # Contour SST
+fig2.colorbar(cont)
 quiver_plot = ax2.quiver(uv_lon_array, uv_lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width') # Quiver u,v
 ax2.set(xlim=[-75.0, -73.0],ylim=[35.25, 37.5])
 plt.show()
@@ -92,23 +98,29 @@ plt.show()
 fig3, ax3 = plt.subplots()
 camera = Camera(fig3)
 for frame_num in range(len(timestamp_datetime_array)):
-    # Track (static)
-    line1, = ax3.plot(lon_array,lat_array,'-',color = 'gray')  
-    ax3.set(xlim=[-75.0, -73.0],ylim=[35.25, 38.0])      
-    # Update the position along the track (line2)
+    # Set plot title
+    print(timestamp_datetime_array[frame_num].item().strftime("%Y-%m-%d"))
+    title_string = tag_id+' '+timestamp_datetime_array[frame_num].item().strftime("%Y-%m-%d")
+    ax3.set_title(title_string)
+    # Plot the static track, 50% transparent
+    line1, = ax3.plot(lon_array,lat_array,'-',color = 'gray',alpha=0.5)  
+    ax3.set(xlim=[-75.0, -73.0],ylim=[35.25, 37.5])      
+    # Update the position (red dot) along the track (line2)
     x = lon_array[frame_num-1:frame_num]
     y = lat_array[frame_num-1:frame_num]
     line2, = ax3.plot(x,y,'ro-',markersize=7)
     # Update SST contour
     # Get fullpath for the nearest (in time) HYCOM TS netcdf file
-    ts_netcdf_fullpath = project_functions.get_HYCOM_TS_fullpath(timestamp_datetime_array[frame_num]) 
+    ts_netcdf_fullpath = project_functions.get_HYCOM_TS_fullpath(timestamp_datetime_array[frame_num].item()) 
     # Get data for sea-surface temperature (SST) contour plot
     ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST_from_HYCOM_netcdf(ts_netcdf_fullpath)
     # Contour plot of SST
-    cont = ax3.contourf(ts_lon_array,ts_lat_array,SST_array[0,:,:],levels=15,cmap=cm.PuBu_r)
+    custom_levels = np.linspace(12,30,num=25)
+    cont = ax3.contourf(ts_lon_array,ts_lat_array,SST_array[0,:,:],levels=custom_levels,cmap=cm.jet)
+    #fig3.colorbar(cont) # Including this causes problems
     # Update quiver of u,v
     # Get fullpath for the nearest (in time) HYCOM uv netcdf file
-    uv_netcdf_fullpath = project_functions.get_HYCOM_UV_fullpath(timestamp_datetime_array[frame_num])
+    uv_netcdf_fullpath = project_functions.get_HYCOM_UV_fullpath(timestamp_datetime_array[frame_num].item())
     # Get data for  the sea-surface velocity quiver plot
     uv_lon_array,uv_lat_array,surface_u_array,surface_v_array = project_functions.get_uv_from_HYCOM_netcdf(uv_netcdf_fullpath)
     # Quiver plot

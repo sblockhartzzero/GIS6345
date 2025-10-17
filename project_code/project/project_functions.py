@@ -19,17 +19,23 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 def get_HYCOM_TS_fullpath(timestamp_datetime):
-    # Fudge for now
-    ts_netcdf_folder= 'C:/Users/s44ba/git/GIS6345/project_data/env_data/CapeHatteras/hycom_TS_CapeHatteras/'
-    ts_netcdf_filename = 'hycom_glby_930_2019030712_t003_ts3z.nc'
-    ts_netcdf_fullpath = ts_netcdf_folder+ts_netcdf_filename 
+    # Convert timestamp_datetime to string
+    datetime_str = timestamp_datetime.strftime("%Y%m%d")
+    ts_netcdf_folder= 'C:/Users/s44ba/git/GIS6345/project_data/env_data/CapeHatteras/hycom_TSUV_CapeHatteras/'
+    #ts_netcdf_filename = 'hycom_GLBv0.08_563_2015102112_t003.nc'
+    ts_netcdf_filename =  'hycom_GLBv0.08_563_'+datetime_str+'12_t003.nc'
+    ts_netcdf_fullpath = ts_netcdf_folder+ts_netcdf_filename
+    #print(ts_netcdf_fullpath)
     return ts_netcdf_fullpath
 
 def get_HYCOM_UV_fullpath(timestamp_datetime):
-    # Fudge for now
-    uv_netcdf_folder= 'C:/Users/s44ba/git/GIS6345/project_data/env_data/CapeHatteras/hycom_UV_CapeHatteras/'
-    uv_netcdf_filename = 'hycom_glby_930_2019030712_t003_uv3z.nc'
+    # Convert timestamp_datetime to string
+    datetime_str = timestamp_datetime.strftime("%Y%m%d")
+    uv_netcdf_folder= 'C:/Users/s44ba/git/GIS6345/project_data/env_data/CapeHatteras/hycom_TSUV_CapeHatteras/'
+    #uv_netcdf_filename = 'hycom_GLBv0.08_563_2015102112_t003.nc'
+    uv_netcdf_filename =  'hycom_GLBv0.08_563_'+datetime_str+'12_t003.nc'
     uv_netcdf_fullpath = uv_netcdf_folder+uv_netcdf_filename
+    #print(uv_netcdf_fullpath)
     return uv_netcdf_fullpath
 
 def get_SST_from_HYCOM_netcdf(netcdf_fullpath):
