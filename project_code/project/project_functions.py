@@ -4,7 +4,8 @@ Spyder Editor
 
 For GIS6345 Project
 
-Assumption: the input netCDF files (from HYCOM) are for a single sample time
+To do:
+    -Fix error: ValueError: cannot reshape array of size 655260 into shape (326,201)
 """
 # To do:
 # Multiple plots, labeled
@@ -12,12 +13,47 @@ Assumption: the input netCDF files (from HYCOM) are for a single sample time
 # Imports
 import xarray as xr
 import pandas as pd
-import geopandas as gpd
+from datetime import datetime
 import netCDF4
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
+"""
+Assumptions
+-Only one HYCOM netcdf file per day
+"""
+
+"""
+movebank data for tracks
+"""
+def get_movebank_track_csv(csv_fullpath, tag_id):
+    
+    # Convert csv to dataframe
+    df = pd.read_csv(csv_fullpath)
+
+    # We need only a few columns, so create a DataFrame containing only the columns
+    # that are needed
+    df_subset = df[['event-id','timestamp','location-long','location-lat','individual-local-identifier']]
+
+    # Add a new column (initialized to 1/1/1970) to convert the timestamp string to datetime
+    df_subset["timestamp_datetime"] = datetime(1970,1,1)
+    format_string = "%Y-%m-%d %H:%M:%S.000"
+    for k in range(len(df_subset)):
+        datetime_string = df_subset.loc[k,"timestamp"]
+        df_subset.loc[k,"timestamp_datetime"] = datetime.strptime(datetime_string,format_string)
+    #endfor
+    print(df_subset.head())
+
+    # Let's look at just one of the tracks.
+    myTrack = df_subset[df_subset['individual-local-identifier']==tag_id]
+    
+    # Return
+    return myTrack
+
+"""
+HYCOM-related functions for environmental data
+"""
 def get_HYCOM_TS_fullpath(timestamp_datetime):
     # Convert timestamp_datetime to string
     datetime_str = timestamp_datetime.strftime("%Y%m%d")
@@ -140,8 +176,58 @@ def plot_HYCOM_TS_and_UV(ts_netcdf_fullpath, uv_netcdf_fullpath):
     plt.show()
     
     return
+
+
+"""
+MUR SST analysis-related functions
+"""
+def pickle_from_MUR_csv(csv_fullpath):
+    # Load csv file into pandas dataframe
+    df = pd.read_csv(csv_fullpath, skiprows = [1])
+       
+    # Temporarily shorten
+    df_short = df.iloc[0:655260]
+
+    # Add a new column (initialized to 1/1/1970) to convert the timestamp string to datetime
+    df_short["timestamp_datetime"] = datetime(1970,1,1)
+    format_string = "%Y-%m-%dT%H:%M:%SZ"
+    for k in range(len(df_short)):
+        datetime_string = df_short.loc[k,"time"]
+        df_short.loc[k,"timestamp_datetime"] = datetime.strptime(datetime_string,format_string)
+    #endfor
+    print(df_short.head())
     
+    # Save to pickle
+    df_short.to_pickle('df_short.pkl')
     
+def get_SST_from_MUR_pkl(pkl_filename, timestamp_datetime_range):
+    
+    # Load from pickle
+    df_short = pd.read_pickle(pkl_filename)
+
+    # Subset in time to get a single i.e. unique timestamp
+    df_in_time_window = (df_short['timestamp_datetime']>timestamp_datetime_range[0]) & (df_short['timestamp_datetime']<=timestamp_datetime_range[1])   # boolean
+    df_subset = df_short[df_in_time_window]
+    df_subset.info()
+    
+    # What is date range in this short file?
+    print(df_subset["timestamp_datetime"].unique())
+     
+    # Grid
+    # Since we already have repeating lon values for each lat, try pivot and to_xarray
+    grid_df = df_subset.set_index(['latitude','longitude' ])
+    x_coords = df_subset['longitude'].unique()
+    y_coords = df_subset['latitude'].unique()
+    SST = grid_df['analysed_sst'].values.reshape(len(y_coords),len(x_coords))
+
+    # Convert to numpy
+    lat_array = np.array(y_coords)
+    lon_array = np.array(x_coords)
+    SST_array = np.array(SST)
+      
+    return lon_array, lat_array, SST_array
+    
+ 
 
 
 
