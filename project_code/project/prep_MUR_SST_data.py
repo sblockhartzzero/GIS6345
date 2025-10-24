@@ -11,7 +11,6 @@ specified date range. This demonstrates conversion from csv to pandas dataframe
 to numpy array to geotiff (the last step using rasterio)
 
 To do:
-    -Convert to geotiff
     -Set to time window that matches animal tracks e.g. 10/20/2015-01/06/2016
 """
 
@@ -36,6 +35,8 @@ pkl_filename = 'df_short.pkl'
 day_num = 1
 for frame_num in range(9):
     
+    print(frame_num)
+    
     # Specify desired timestamp_datetime_range
     timestamp_datetime_range = [datetime(2015,1,day_num), datetime(2015,1,day_num+1)]
     
@@ -54,24 +55,37 @@ for frame_num in range(9):
     max_lat = np.max(lat_array)
     this_transform = rasterio.transform.from_origin(min_lon,max_lat,0.01,-0.01)
     
+    # Scale to 0-65536 (from standard SST Fahrenheit range of 40-80)
+    min_SST_val = np.min(SST_array)
+    max_SST_val = np.max(SST_array)
+    new_min_val = 40
+    new_max_val = 80
+    standard_SST_range_F = new_max_val-new_min_val   # range of temperature from min to max in Farenheit
+    new_dynamic_range = 2**16   # full-scale range of integer values per pixel
+    scale_factor = new_dynamic_range/standard_SST_range_F
+    SST_array_scaled = ((SST_array-new_min_val)*scale_factor)
+    SST_array_scaled_int = SST_array_scaled.astype(np.uint16)
+    print("Min SST_array_scaled_int =", np.min(SST_array_scaled_int))
+    print("Max SST_array_scaled_int =", np.max(SST_array_scaled_int))
+       
     # Export as geotiff i.e. convert to raster using  rasterio
     # Following example at https://rasterio.readthedocs.io/en/stable/quickstart.html
     # with different transform, different crs
     # Create raster dataset
     new_dataset = rasterio.open(
-    'new.tif',
+    'new_scaled_int.tif',
     'w',
     driver='GTiff',
-    height=SST_array.shape[0],
-    width=SST_array.shape[1],
+    height=SST_array_scaled_int.shape[0],
+    width=SST_array_scaled_int.shape[1],
     count=1,
-    dtype=SST_array.dtype,
+    dtype=SST_array_scaled_int.dtype,
     crs=rasterio.crs.CRS.from_epsg(4326),
     transform=this_transform,
     )
     
     # Save raster dataset
-    new_dataset.write(SST_array, 1)
+    new_dataset.write(SST_array_scaled_int, 1)
     
     # Close raster dataset
     new_dataset.close()
@@ -80,6 +94,9 @@ for frame_num in range(9):
     day_num = day_num + 1
     
 #endfor    
+
+
+
     
 
 
