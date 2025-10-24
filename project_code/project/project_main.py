@@ -31,7 +31,7 @@ track_csv_fullpath = 'C:/Users/s44ba/git/GIS6345/project_data/track_data/Short_f
 
 # Let's look at just one of the tracks. From data exploration, I found GmTag142 to be 
 # interesting i.e. it went through my region of interest
-tag_id = 'GmTag142'  # e.g. 'GmTag142' or 'GmTag137'
+tag_id = 'GmTag137'  # e.g. 'GmTag142' or 'GmTag137'
 
 # Call function to get the individual track, as apndas dataframe
 myTrack = project_functions.get_movebank_track_csv(track_csv_fullpath, tag_id)
@@ -81,6 +81,9 @@ ax2.set(xlim=[-75.0, -73.0],ylim=[35.25, 37.5])
 # Set plot title
 title_string = tag_id
 plt.title(title_string)
+# Labels 
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
 # Update text
 text_string = timestamp_datetime_array[0].item().strftime("%Y-%m-%d")
 ax2.text(0.8,0.8,text_string)
@@ -115,11 +118,14 @@ for frame_num in range(len(timestamp_datetime_array)):
     # Quiver plot
     quiver_plot = ax3.quiver(uv_lon_array, uv_lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width') # Quiver u,v
     # Update plot title
-    title_string = tag_id
+    title_string = 'Animal track for '+tag_id
     plt.title(title_string)
     # Update text
     text_string = timestamp_datetime_array[frame_num].item().strftime("%Y-%m-%d")
     plt.text(0.8,0.8,text_string)
+    # Labels 
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
     # Snap picture of this frame
     camera.snap()
 #endfor
