@@ -13,6 +13,10 @@ The animal track is from a specified file downloaded from movebank.org.
 
 The oceanographic data is sea surface temperature and velocity from HYCOM hindcasts.
 
+To do: 
+    -Add switch for HYCOM or MUR data. The former has both SST and current velocity.
+     The latter only SST...
+     
 """
 # Imports
 import pandas as pd
@@ -24,7 +28,7 @@ from matplotlib.animation import FuncAnimation
 from celluloid import Camera
 import project_functions
 
-#==============LOAD DATA INTO PANDAS DATAFRAME========================
+#==============LOAD ANIMAL TELEMETRY DATA INTO PANDAS DATAFRAME==============================
 # Specify fullpath to input csv file containing multiple animal tracks
 # i.e. the csv downloaded from movebank.org and load it into a pandas DataFrame
 track_csv_fullpath = 'C:/Users/s44ba/git/GIS6345/project_data/track_data/Short_finned_pilot_whales_CRC_NW_Atlantic.csv'
@@ -40,7 +44,7 @@ myTrack = project_functions.get_movebank_track_csv(track_csv_fullpath, tag_id)
 myTrack_in_time_window = myTrack['timestamp_datetime']<datetime(2016,1,6)   # boolean
 myTrack_subset = myTrack[myTrack_in_time_window]
 
-#===============CONVERT TO NUMPY ARRAYS=====================
+#===============CONVERT ANIMAL TELEMETRY DATA TO NUMPY ARRAYS================================
 # Extract arrays 
 df_lat = myTrack_subset['location-lat']
 df_lon = myTrack_subset['location-long']
@@ -54,7 +58,7 @@ timestamp_datetime_array = np.array(df_timestamp_datetime)
 # print min and max timestamp during this period
 print("Time from ",df_timestamp_datetime.min()," to ",df_timestamp_datetime.max())
 
-#============SAMPLE PLOTS===========
+#============INTEGRATE ANIMAL TELEMETRY DATA WITH OCEANOGRAPHIC DATA AND PLOT (STATIC)=======
 # Plot just the track
 fig1, ax1 = plt.subplots()
 ax1.plot(lon_array,lat_array)
@@ -90,7 +94,7 @@ ax2.text(0.8,0.8,text_string)
 # Show
 plt.show()
 
-#===========ANIMATE USING CELLULOID==============================
+#===========INTEGRATE ANIMAL TELEMETRY DATA WITH OCEANOGRAPHIC DATA AND ANIMATE==============
 fig3, ax3 = plt.subplots()
 camera = Camera(fig3)
 for frame_num in range(len(timestamp_datetime_array)):
