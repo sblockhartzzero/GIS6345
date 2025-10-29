@@ -38,7 +38,7 @@ track_csv_fullpath = 'C:/Users/s44ba/git/GIS6345/project_data/track_data/Short_f
 tag_id = 'GmTag137'  # e.g. 'GmTag142' or 'GmTag137'
 
 # Call function to get the individual track, as apndas dataframe
-myTrack = project_functions.get_movebank_track_csv(track_csv_fullpath, tag_id)
+myTrack = project_functions.get_movebank_track_from_csv(track_csv_fullpath, tag_id)
 
 # Subset myTrack in time
 myTrack_in_time_window = myTrack['timestamp_datetime']<datetime(2016,1,6)   # boolean

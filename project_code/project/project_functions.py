@@ -27,8 +27,7 @@ Assumptions
 """
 movebank data for tracks
 """
-def get_movebank_track_csv(csv_fullpath, tag_id):
-    
+def get_movebank_tracks_from_csv(csv_fullpath):
     # Convert csv to dataframe
     df = pd.read_csv(csv_fullpath)
 
@@ -44,9 +43,16 @@ def get_movebank_track_csv(csv_fullpath, tag_id):
         df_subset.loc[k,"timestamp_datetime"] = datetime.strptime(datetime_string,format_string)
     #endfor
     print(df_subset.head())
+    
+    # Return
+    return df_subset
+    
+def get_movebank_track_from_csv(csv_fullpath, tag_id):    
+    # Convert from csv to pandas dataframe, enriching with datetime
+    df_movebank_tracks = get_movebank_tracks_from_csv(csv_fullpath)
 
     # Let's look at just one of the tracks.
-    myTrack = df_subset[df_subset['individual-local-identifier']==tag_id]
+    myTrack = df_movebank_tracks[df_movebank_tracks['individual-local-identifier']==tag_id]
     
     # Return
     return myTrack
