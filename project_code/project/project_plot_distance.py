@@ -47,12 +47,12 @@ print(gdf_reference_utm)
 ref_point_utm = Point(490343.697, 3888451.864)
 
 # Specify date range
-min_datetime = datetime(2014,1,1)
-max_datetime = datetime(2015,4,1)
-#min_datetime = datetime(2015,4,1)
-#max_datetime = datetime(2016,2,1)
-#min_datetime = datetime(2016,2,1)
-#max_datetime = datetime(2020,2,1)
+#min_datetime = datetime(2014,6,1)
+#max_datetime = datetime(2015,4,1)
+#min_datetime = datetime(2015,10,1)
+#max_datetime = datetime(2015,11,1)
+min_datetime = datetime(2018,1,1)
+max_datetime = datetime(2020,4,1)
 
 #==============LOAD ANIMAL TELEMETRY DATA INTO PANDAS DATAFRAME==============================
 # Specify fullpath to input csv file containing multiple animal tracks

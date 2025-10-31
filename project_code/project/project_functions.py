@@ -4,8 +4,6 @@ Spyder Editor
 
 For GIS6345 Project
 
-To do:
-    -Fix error: ValueError: cannot reshape array of size 655260 into shape (326,201)
 """
 # To do:
 # Multiple plots, labeled
@@ -187,12 +185,13 @@ def plot_HYCOM_TS_and_UV(ts_netcdf_fullpath, uv_netcdf_fullpath):
 """
 MUR SST analysis-related functions
 """
-def pickle_from_MUR_csv(csv_fullpath):
+def pickle_from_MUR_csv(csv_fullpath, pkl_filename):
     # Load csv file into pandas dataframe
     df = pd.read_csv(csv_fullpath, skiprows = [1])
        
     # Temporarily shorten
-    df_short = df.iloc[0:655260]
+    #df_short = df.iloc[0:655260]
+    df_short = df
 
     # Add a new column (initialized to 1/1/1970) to convert the timestamp string to datetime
     df_short["timestamp_datetime"] = datetime(1970,1,1)
@@ -204,9 +203,12 @@ def pickle_from_MUR_csv(csv_fullpath):
     print(df_short.head())
     
     # Save to pickle
-    df_short.to_pickle('df_short.pkl')
+    df_short.to_pickle(pkl_filename)
     
 def get_SST_from_MUR_pkl(pkl_filename, timestamp_datetime_range):
+    # Note that the temporal resolution of this dataset is daily. Therefore, to get the same
+    # interface as get_SST_from_HYCOM_netcdf, the caller should make sure that the timestamp_datetime_range
+    # is a single day
     
     # Load from pickle
     df_short = pd.read_pickle(pkl_filename)

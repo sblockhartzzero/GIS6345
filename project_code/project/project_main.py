@@ -11,10 +11,12 @@ overlaying time-varying oceanographic data.
 
 The animal track is from a specified file downloaded from movebank.org.
 
-The oceanographic data is sea surface temperature and velocity from HYCOM hindcasts.
+The oceanographic data is either:
+    -temperature and velocity from HYCOM hindcasts
+    -SST from MUR
 
 To do: 
-    -Add switch for HYCOM or MUR data. The former has both SST and current velocity.
+    -Use switch for 'HYCOM' or 'MUR' data. The former has both SST and current velocity.
      The latter only SST...
      
 """
@@ -27,6 +29,9 @@ from matplotlib import cm
 from matplotlib.animation import FuncAnimation
 from celluloid import Camera
 import project_functions
+
+#==============SPECIFY DATA SOURCE FOR OCEANOGRAPHIC DATA====================================
+env_data_src  = 'HYCOM'
 
 #==============LOAD ANIMAL TELEMETRY DATA INTO PANDAS DATAFRAME==============================
 # Specify fullpath to input csv file containing multiple animal tracks
@@ -65,7 +70,7 @@ ax1.plot(lon_array,lat_array)
 
 # Plot track with overlays of oceanographic data
 # Get fullpath for the nearest (in time) HYCOM TS netcdf file
-# Noteuse of .item() to convert numpy datetime back to datetime.datetime
+# Note use of .item() to convert numpy datetime back to datetime.datetime
 ts_netcdf_fullpath = project_functions.get_HYCOM_TS_fullpath(timestamp_datetime_array[0].item()) 
 # Get data for sea-surface temperature (SST) contour plot
 ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST_from_HYCOM_netcdf(ts_netcdf_fullpath)
