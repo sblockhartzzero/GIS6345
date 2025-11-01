@@ -14,10 +14,6 @@ The animal track is from a specified file downloaded from movebank.org.
 The oceanographic data is either:
     -temperature and velocity from HYCOM hindcasts
     -SST from MUR
-
-To do: 
-    -Use switch for 'HYCOM' or 'MUR' data. The former has both SST and current velocity.
-     The latter only SST...
      
 """
 # Imports
@@ -26,12 +22,12 @@ from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from matplotlib.animation import FuncAnimation
 from celluloid import Camera
 import project_functions
 
 #==============SPECIFY DATA SOURCE FOR OCEANOGRAPHIC DATA====================================
-env_data_src  = 'HYCOM'
+# Specify whether oceanographic data is from 'HYCOM' opr 'MUR'
+env_data_src  = 'MUR'
 
 #==============LOAD ANIMAL TELEMETRY DATA INTO PANDAS DATAFRAME==============================
 # Specify fullpath to input csv file containing multiple animal tracks
@@ -69,23 +65,33 @@ fig1, ax1 = plt.subplots()
 ax1.plot(lon_array,lat_array)
 
 # Plot track with overlays of oceanographic data
-# Get fullpath for the nearest (in time) HYCOM TS netcdf file
+# Get data for the SST plot
 # Note use of .item() to convert numpy datetime back to datetime.datetime
-ts_netcdf_fullpath = project_functions.get_HYCOM_TS_fullpath(timestamp_datetime_array[0].item()) 
-# Get data for sea-surface temperature (SST) contour plot
-ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST_from_HYCOM_netcdf(ts_netcdf_fullpath)
-# Get fullpath for the nearest (in time) HYCOM uv netcdf file
-uv_netcdf_fullpath = project_functions.get_HYCOM_UV_fullpath(timestamp_datetime_array[0].item())
-# Get data for  the sea-surface velocity quiver plot
-uv_lon_array,uv_lat_array,surface_u_array,surface_v_array = project_functions.get_uv_from_HYCOM_netcdf(uv_netcdf_fullpath)
+ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST(timestamp_datetime_array[0].item(),env_data_src)
+
+# Data source-specific stuff
+if (env_data_src=='HYCOM'):
+    # Set custom levels for SST (degrees C)
+    custom_SST_levels = np.linspace(8,29,num=22)
+    # Get fullpath for the nearest (in time) HYCOM uv netcdf file
+    uv_netcdf_fullpath = project_functions.get_HYCOM_UV_fullpath(timestamp_datetime_array[0].item())
+    # Get data for  the sea-surface velocity quiver plot
+    uv_lon_array,uv_lat_array,surface_u_array,surface_v_array = project_functions.get_uv_from_HYCOM_netcdf(uv_netcdf_fullpath)
+else:
+    # Set custom levels for SST (degrees F)
+    #custom_SST_levels = 22
+    custom_SST_levels = np.linspace(55,83,num=40)
+#endif
+
 # Plot track with overlays 
 fig2, ax2 = plt.subplots()
 line1, = ax2.plot(lon_array,lat_array,'-',color = 'gray',alpha=0.5)        # Track
 line2, = ax2.plot(lon_array[0],lat_array[0],'ro-',markersize=7)  # Position along track
-custom_levels = np.linspace(8,29,num=22)
-cont = ax2.contourf(ts_lon_array,ts_lat_array,SST_array[0,:,:],levels=custom_levels,cmap=cm.jet)  # Contour SST
+cont = ax2.contourf(ts_lon_array,ts_lat_array,SST_array,levels=custom_SST_levels,cmap=cm.jet)  # Contour SST
 fig2.colorbar(cont)
-quiver_plot = ax2.quiver(uv_lon_array, uv_lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width') # Quiver u,v
+if (env_data_src=='HYCOM'):
+    quiver_plot = ax2.quiver(uv_lon_array, uv_lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width') # Quiver u,v
+#endif
 ax2.set(xlim=[-75.0, -73.0],ylim=[35.25, 37.5])
 # Set plot title
 title_string = tag_id
@@ -99,6 +105,7 @@ ax2.text(0.8,0.8,text_string)
 # Show
 plt.show()
 
+
 #===========INTEGRATE ANIMAL TELEMETRY DATA WITH OCEANOGRAPHIC DATA AND ANIMATE==============
 fig3, ax3 = plt.subplots()
 camera = Camera(fig3)
@@ -111,21 +118,25 @@ for frame_num in range(len(timestamp_datetime_array)):
     y = lat_array[frame_num-1:frame_num]
     line2, = ax3.plot(x,y,'ro-',markersize=7)
     # Update SST contour
-    # Get fullpath for the nearest (in time) HYCOM TS netcdf file
-    ts_netcdf_fullpath = project_functions.get_HYCOM_TS_fullpath(timestamp_datetime_array[frame_num].item()) 
-    # Get data for sea-surface temperature (SST) contour plot
-    ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST_from_HYCOM_netcdf(ts_netcdf_fullpath)
-    # Contour plot of SST
-    custom_levels = np.linspace(8,29,num=22)
-    cont = ax3.contourf(ts_lon_array,ts_lat_array,SST_array[0,:,:],levels=custom_levels,cmap=cm.jet)
+    
+    # Get data for the SST plot
+    # Note use of .item() to convert numpy datetime back to datetime.datetime
+    ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST(timestamp_datetime_array[frame_num].item(),env_data_src)
+    
+    # Contour plot of SST   
+    cont = ax3.contourf(ts_lon_array,ts_lat_array,SST_array,levels=custom_SST_levels,cmap=cm.jet)
     #fig3.colorbar(cont) # Including this causes problems
+    
     # Update quiver of u,v
-    # Get fullpath for the nearest (in time) HYCOM uv netcdf file
-    uv_netcdf_fullpath = project_functions.get_HYCOM_UV_fullpath(timestamp_datetime_array[frame_num].item())
-    # Get data for  the sea-surface velocity quiver plot
-    uv_lon_array,uv_lat_array,surface_u_array,surface_v_array = project_functions.get_uv_from_HYCOM_netcdf(uv_netcdf_fullpath)
-    # Quiver plot
-    quiver_plot = ax3.quiver(uv_lon_array, uv_lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width') # Quiver u,v
+    if (env_data_src=='HYCOM'):
+        # Get fullpath for the nearest (in time) HYCOM uv netcdf file
+        uv_netcdf_fullpath = project_functions.get_HYCOM_UV_fullpath(timestamp_datetime_array[frame_num].item())
+        # Get data for  the sea-surface velocity quiver plot
+        uv_lon_array,uv_lat_array,surface_u_array,surface_v_array = project_functions.get_uv_from_HYCOM_netcdf(uv_netcdf_fullpath)
+        # Quiver plot
+        quiver_plot = ax3.quiver(uv_lon_array, uv_lat_array, surface_u_array[0,:,:], surface_v_array[0,:,:], units='width') # Quiver u,v
+    #endif
+    
     # Update plot title
     title_string = 'Animal track for '+tag_id
     plt.title(title_string)
@@ -141,6 +152,8 @@ for frame_num in range(len(timestamp_datetime_array)):
 animation = camera.animate(interval=120)
 mp4_filename = tag_id + '.mp4' 
 animation.save(mp4_filename)  
+
+
 
 
 

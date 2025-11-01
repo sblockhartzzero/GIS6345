@@ -45,6 +45,7 @@ def get_movebank_tracks_from_csv(csv_fullpath):
     # Return
     return df_subset
     
+
 def get_movebank_track_from_csv(csv_fullpath, tag_id):    
     # Convert from csv to pandas dataframe, enriching with datetime
     df_movebank_tracks = get_movebank_tracks_from_csv(csv_fullpath)
@@ -54,6 +55,7 @@ def get_movebank_track_from_csv(csv_fullpath, tag_id):
     
     # Return
     return myTrack
+
 
 """
 HYCOM-related functions for environmental data
@@ -68,6 +70,7 @@ def get_HYCOM_TS_fullpath(timestamp_datetime):
     #print(ts_netcdf_fullpath)
     return ts_netcdf_fullpath
 
+
 def get_HYCOM_UV_fullpath(timestamp_datetime):
     # Convert timestamp_datetime to string
     datetime_str = timestamp_datetime.strftime("%Y%m%d")
@@ -77,6 +80,7 @@ def get_HYCOM_UV_fullpath(timestamp_datetime):
     uv_netcdf_fullpath = uv_netcdf_folder+uv_netcdf_filename
     #print(uv_netcdf_fullpath)
     return uv_netcdf_fullpath
+
 
 def get_SST_from_HYCOM_netcdf(netcdf_fullpath):
     # Open netcdf file
@@ -100,7 +104,8 @@ def get_SST_from_HYCOM_netcdf(netcdf_fullpath):
     
     # Return
     return lon_array,lat_array,SST_array
-    
+ 
+   
 def get_uv_from_HYCOM_netcdf(netcdf_fullpath):
     # Open netcdf file
     ds_loaded = netCDF4.Dataset(netcdf_fullpath)
@@ -204,7 +209,26 @@ def pickle_from_MUR_csv(csv_fullpath, pkl_filename):
     
     # Save to pickle
     df_short.to_pickle(pkl_filename)
+
     
+def get_datetime_range_for_the_day(timestamp_datetime):
+    # Given this timestamp_datetime, create a timestamp_datetime_range
+    # for the day.
+    this_year = timestamp_datetime.year
+    this_month = timestamp_datetime.month
+    this_day = timestamp_datetime.day
+    
+    # Set t1
+    t1 = datetime(this_year,this_month,this_day,1,0,0)
+    
+    # Set t2
+    t2 = datetime(this_year,this_month,this_day,23,0,0)
+    
+    # Return
+    timestamp_datetime_range = [t1, t2]
+    return timestamp_datetime_range
+    
+       
 def get_SST_from_MUR_pkl(pkl_filename, timestamp_datetime_range):
     # Note that the temporal resolution of this dataset is daily. Therefore, to get the same
     # interface as get_SST_from_HYCOM_netcdf, the caller should make sure that the timestamp_datetime_range
@@ -235,7 +259,35 @@ def get_SST_from_MUR_pkl(pkl_filename, timestamp_datetime_range):
       
     return lon_array, lat_array, SST_array
     
- 
+
+"""
+Oceanographic data (whether HYCOM or MUR)
+"""
+def get_SST(timestamp_datetime, env_data_src):
+    # Switch on env_data_src
+    match env_data_src:
+        case "HYCOM":
+            # Get fullpath for the nearest (in time) HYCOM TS netcdf file
+            ts_netcdf_fullpath = get_HYCOM_TS_fullpath(timestamp_datetime) 
+            # Get SST for this day
+            lon_array,lat_array,this_SST_array = get_SST_from_HYCOM_netcdf(ts_netcdf_fullpath)
+            # Standardize
+            SST_array = this_SST_array[0,:,:]
+        case "MUR":
+            # Specify pickled file (for MUR SST data)
+            pkl_filename = 'df_MUR_SST.pkl'
+            # Get timestamp_datetime_range for this day
+            timestamp_datetime_range = get_datetime_range_for_the_day(timestamp_datetime)        
+            # Get SST for this day
+            lon_array, lat_array, SST_array = get_SST_from_MUR_pkl(pkl_filename, timestamp_datetime_range)            
+    #endmatch 
+    
+    # Return
+    return lon_array,lat_array,SST_array      
+        
+        
+    
+    
 
 
 

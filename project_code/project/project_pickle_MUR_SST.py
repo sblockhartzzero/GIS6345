@@ -14,11 +14,11 @@ import project_functions
 
 # Specify csv file for MUR SST
 csv_folder = 'C:\\Users\\s44ba\\git\\GIS6345\\project_data\\env_data\\CapeHatteras\\MUR_SST_CapeHatteras\\'
-csv_filename = 'jplMURSST41F_de75_def0_78ea.csv';
+csv_filename = 'jplMURSST41F_56bc_5beb_086c.csv';
 csv_fullpath = csv_folder + csv_filename
 
 # Specify pickled file
-pkl_filename = 'df_short.pkl'
+pkl_filename = 'df_MUR_SST.pkl'
 
 # Convert csv to pandas dataframe and save to pickle file for subsequent runs
 project_functions.pickle_from_MUR_csv(csv_fullpath,pkl_filename)
