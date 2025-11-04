@@ -190,6 +190,18 @@ def plot_HYCOM_TS_and_UV(ts_netcdf_fullpath, uv_netcdf_fullpath):
 """
 MUR SST analysis-related functions
 """
+def get_MUR_pickle_filename(env_scenario):
+    # Specify pickled file (for MUR SST data) based upon the env_scenario
+    match env_scenario:
+        case "GIS6345":
+            pkl_filename = 'df_MUR_SST.pkl'
+        case "OS2026_1":
+            pkl_filename = 'df_MUR_SST_OS2026_1.pkl'
+    #endmatch
+    
+    return pkl_filename
+
+
 def pickle_from_MUR_csv(csv_fullpath, pkl_filename):
     # Load csv file into pandas dataframe
     df = pd.read_csv(csv_fullpath, skiprows = [1])
@@ -263,7 +275,7 @@ def get_SST_from_MUR_pkl(pkl_filename, timestamp_datetime_range):
 """
 Oceanographic data (whether HYCOM or MUR)
 """
-def get_SST(timestamp_datetime, env_data_src):
+def get_SST(timestamp_datetime, env_data_src, env_scenario):
     # Switch on env_data_src
     match env_data_src:
         case "HYCOM":
@@ -274,8 +286,8 @@ def get_SST(timestamp_datetime, env_data_src):
             # Standardize
             SST_array = this_SST_array[0,:,:]
         case "MUR":
-            # Specify pickled file (for MUR SST data)
-            pkl_filename = 'df_MUR_SST.pkl'
+            # Get pickled filename (for MUR SST data) based upon the env_scenario
+            pkl_filename = get_MUR_pickle_filename(env_scenario)        
             # Get timestamp_datetime_range for this day
             timestamp_datetime_range = get_datetime_range_for_the_day(timestamp_datetime)        
             # Get SST for this day

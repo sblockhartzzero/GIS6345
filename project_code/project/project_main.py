@@ -29,6 +29,9 @@ import project_functions
 # Specify whether oceanographic data is from 'HYCOM' opr 'MUR'
 env_data_src  = 'MUR'
 
+# Specify scenario (which ultimately determines which pickle file to use for MUR SST)
+env_scenario = 'GIS6345'
+
 #==============LOAD ANIMAL TELEMETRY DATA INTO PANDAS DATAFRAME==============================
 # Specify fullpath to input csv file containing multiple animal tracks
 # i.e. the csv downloaded from movebank.org and load it into a pandas DataFrame
@@ -67,7 +70,7 @@ ax1.plot(lon_array,lat_array)
 # Plot track with overlays of oceanographic data
 # Get data for the SST plot
 # Note use of .item() to convert numpy datetime back to datetime.datetime
-ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST(timestamp_datetime_array[0].item(),env_data_src)
+ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST(timestamp_datetime_array[0].item(),env_data_src,env_scenario)
 
 # Data source-specific stuff
 if (env_data_src=='HYCOM'):
@@ -121,7 +124,7 @@ for frame_num in range(len(timestamp_datetime_array)):
     
     # Get data for the SST plot
     # Note use of .item() to convert numpy datetime back to datetime.datetime
-    ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST(timestamp_datetime_array[frame_num].item(),env_data_src)
+    ts_lon_array,ts_lat_array,SST_array = project_functions.get_SST(timestamp_datetime_array[frame_num].item(),env_data_src,env_scenario)
     
     # Contour plot of SST   
     cont = ax3.contourf(ts_lon_array,ts_lat_array,SST_array,levels=custom_SST_levels,cmap=cm.jet)
