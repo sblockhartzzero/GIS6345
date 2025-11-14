@@ -7,6 +7,8 @@ Created on Fri Oct 31 13:45:48 2025
 For GIS6345 Project
 
 From the MUR SST csv file, save to pkl file for subsequent processing.
+
+If adding a new env_scenario, make sure to add it to project_functions.get_MUR_pickle_filename as well.
 """
 
 # Imports
@@ -17,7 +19,7 @@ csv_folder = 'C:\\Users\\s44ba\\git\\GIS6345\\project_data\\env_data\\CapeHatter
 
 # Specify scenario (which determines pickle filename to use for MUR SST)
 # Could be 'GIS6345' or 'OS2026_1' to 'OS2026_4'
-env_scenario = 'OS2026_1'
+env_scenario = 'OS2026_2'
 
 # Specify scenario (which defines input data file)
 match env_scenario:
@@ -29,6 +31,10 @@ match env_scenario:
         # Specify input csv filename
         # From 2/15/2015 to 4/1/2015 w/0.02 degrees res and wider range of lons (to -76.0)
         csv_filename = 'jplMURSST41F_aa56_bb6c_1813.csv'
+    case 'OS2026_2':
+        # Specify input csv filename
+        # From 2/15/2016 to 4/1/2016 w/0.02 degrees res and wider range of lons (to -76.0)
+        csv_filename = 'jplMURSST41F_2c81_ca33_a3f1.csv'
 #endmatch
 
 csv_fullpath = csv_folder + csv_filename

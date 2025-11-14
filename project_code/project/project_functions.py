@@ -197,6 +197,8 @@ def get_MUR_pickle_filename(env_scenario):
             pkl_filename = 'df_MUR_SST.pkl'
         case "OS2026_1":
             pkl_filename = 'df_MUR_SST_OS2026_1.pkl'
+        case "OS2026_2":
+            pkl_filename = 'df_MUR_SST_OS2026_2.pkl'
     #endmatch
     
     return pkl_filename
