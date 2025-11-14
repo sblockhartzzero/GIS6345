@@ -12,8 +12,9 @@ The oceanographic data is either:
     -temperature and velocity from HYCOM hindcasts (not yet supported for OS2026)
     -SST from MUR
 
-The env_scenario corresponds to a date range for the OS2026 analysis. See the README.txt file
-at C:\\Users\\s44ba\\git\\GIS6345\\project_data\\env_data\\CapeHatteras\\MUR_SST_CapeHatteras.     
+The env_scenario corresponds to a date range (and download file) for the OS2026 analysis. See the README.txt file
+at C:\\Users\\s44ba\\git\\GIS6345\\project_data\\env_data\\CapeHatteras\\MUR_SST_CapeHatteras. Before adding a 
+new env_scenario, you need to add it to project_pickle_MUR_SST.py and to project_functions.get_MUR_pickle_filename.  
 """
 # Imports
 import pandas as pd
@@ -30,13 +31,19 @@ env_data_src  = 'MUR'
 
 # Specify scenario (which ultimately determines which pickle file to use for MUR SST)
 # Could be 'GIS6345' or 'OS2026_1' to 'OS2026_4'
-env_scenario = 'OS2026_1'
+env_scenario = 'OS2026_2'
 
 # Specify scenario (which defines time frame as well as input data file)
 match env_scenario:
     case 'OS2026_1':
         start_datetime = datetime(2015,2,15)  
         num_days = 40
+    case 'OS2026_2':
+        start_datetime = datetime(2016,2,15)  
+        num_days = 40
+    case 'OS2026_3':
+        start_datetime = datetime(2018,2,15)  
+        num_days = 40        
 #endmatch
 
 #===========CREATE ARRAY OF DATETIMES========================================================
