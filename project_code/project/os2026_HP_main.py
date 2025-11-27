@@ -30,6 +30,7 @@ from datetime import datetime, timedelta
 import geopandas as gpd
 from shapely.geometry import Point
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from celluloid import Camera
@@ -95,18 +96,27 @@ lon_array = np.array(lon)
 # First, specify geometry
 geometry = gpd.points_from_xy(df_points_in_T_range['longitude'],df_points_in_T_range['latitude'])
 gdf_boundary = gpd.GeoDataFrame(df_points_in_T_range,geometry=geometry,crs="EPSG:4326")
+#print(gdf_boundary.geometry.iloc[7])
 
 # Convert track to UTM zone 18
 gdf_boundary_utm = gdf_boundary.to_crs(my_UTM_crs)
 
-# Distance to reference point
+# Distance and bearing (in degrees ccw from N) to reference point
 gdf_boundary_utm['distance_to_reference'] = gdf_boundary_utm.geometry.distance(ref_point_utm)
+#print(gdf_boundary_utm.geometry.iloc[7])
 
 # Extract arrays
 distance_km = gdf_boundary_utm['distance_to_reference']/1000.0
-distance_km.info()
 min_distance_km = distance_km.min()
+min_distance_km_index_val = distance_km.idxmin()
 print("Min distance (in km) = ",min_distance_km)
+
+# Bearing between points i.e. between boundary (closest approach) and reference point
+boundary_point_utm = gdf_boundary_utm.geometry.loc[min_distance_km_index_val]
+delta_y = ref_point_utm.y - boundary_point_utm.y
+delta_x = ref_point_utm.x - boundary_point_utm.x
+bearing = (180/np.pi)*math.atan2(delta_y, delta_x)
+print("bearing = ",bearing)
 
 # Plot
 gdf_boundary_utm.plot()
@@ -117,6 +127,7 @@ plt.show()
 # Init
 num_frames = len(timestamp_datetime_array)
 distance_to_boundary_km = np.zeros(num_frames)
+bearing_to_boundary_degrees = np.zeros(num_frames)
 fig3, ax3 = plt.subplots()
 camera = Camera(fig3)
 for frame_num in range(num_frames):  
@@ -158,13 +169,20 @@ for frame_num in range(num_frames):
     # Distance to reference point
     gdf_boundary_utm['distance_to_reference'] = gdf_boundary_utm.geometry.distance(ref_point_utm)
 
-    # Extract arrays
+    # Extract arrays and get min distance 
     distance_km = gdf_boundary_utm['distance_to_reference']/1000.0
-    distance_km.info()
     min_distance_km = distance_km.min()
+    min_distance_km_index_val = distance_km.idxmin()
+    
+    # Bearing between points i.e. between boundary (closest approach) and reference point
+    boundary_point_utm = gdf_boundary_utm.geometry.loc[min_distance_km_index_val]
+    delta_y = ref_point_utm.y - boundary_point_utm.y
+    delta_x = ref_point_utm.x - boundary_point_utm.x
+    bearing = (180/np.pi)*math.atan2(delta_y, delta_x)
     
     # Save
     distance_to_boundary_km[frame_num] = min_distance_km
+    bearing_to_boundary_degrees[frame_num] = bearing
     
 #endfor
 animation = camera.animate(interval=120)
@@ -175,8 +193,10 @@ animation.save(mp4_filename)
 fig4, ax4 = plt.subplots()
 ax4.plot(distance_to_boundary_km)
 plt.show()
+fig5, ax5 = plt.subplots()
+ax5.plot(bearing_to_boundary_degrees)
+plt.show()
 print(distance_to_boundary_km)
-
  
 
 

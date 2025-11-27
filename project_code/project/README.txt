@@ -14,4 +14,4 @@ GIS 6345 ASSIGNMENT #9
 OS2026:
 project_pickle_MUR_SST.py, project_functions.py, and project_main.py modified to support OS2026 scenarios (i.e. env_scenario) 
 os2026_main.py calls project_functions.py (after running project_pickle_MUR_SST.py to save pickle file)
-os2026_main.py also calls ../try_hp/os2026_functions.py to try to identify distance to western edge of Gulf Stream
+os2026_HP_main.py also calls ../try_hp/os2026_functions.py to try to identify distance to the western edge of the Gulf Stream
