@@ -14,7 +14,10 @@ The oceanographic data is either:
 
 The env_scenario corresponds to a date range (and download file) for the OS2026 analysis. See the README.txt file
 at C:\\Users\\s44ba\\git\\GIS6345\\project_data\\env_data\\CapeHatteras\\MUR_SST_CapeHatteras. Before adding a 
-new env_scenario, you need to add it to project_pickle_MUR_SST.py and to project_functions.get_MUR_pickle_filename.  
+new env_scenario, you need to add it to project_pickle_MUR_SST.py and to project_functions.get_MUR_pickle_filename. 
+
+To  do:
+    -support for OS2026_3 
 """
 # Imports
 import pandas as pd
@@ -24,6 +27,11 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from celluloid import Camera
 import project_functions
+
+# Custom import from a different folder
+import sys
+sys.path.append('../try_hp')
+import os2026_functions
 
 #==============USER INPUT===================================================================
 # Specify whether oceanographic data is from 'HYCOM' opr 'MUR'
@@ -62,6 +70,23 @@ else:
     #custom_SST_levels = 25
     custom_SST_levels = np.linspace(40,81,num=40)
 #endif
+
+# Plot SST image and HP-filtered SST image
+HP_SST_array = os2026_functions.hpfilter_band_from_array(SST_array)
+# Plot HP-filtered SST image
+plt.imshow(SST_array)
+plt.show() 
+plt.imshow(HP_SST_array)
+plt.colorbar()
+plt.show()
+#plt.hist(HP_SST_array,bins='auto')
+#plt.show()
+
+# Plot track with overlays 
+fig1, ax1 = plt.subplots()
+cont = ax1.contourf(ts_lon_array,ts_lat_array,HP_SST_array)  # Contour SST
+fig1.colorbar(cont)
+plt.show()
 
 # Plot track with overlays 
 fig2, ax2 = plt.subplots()
