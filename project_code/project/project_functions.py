@@ -193,12 +193,18 @@ MUR SST analysis-related functions
 def get_MUR_pickle_filename(env_scenario):
     # Specify pickled file (for MUR SST data) based upon the env_scenario
     match env_scenario:
-        case "GIS6345":
+        case 'GIS6345':
             pkl_filename = 'df_MUR_SST.pkl'
-        case "OS2026_1":
+        case 'OS2026_1':
             pkl_filename = 'df_MUR_SST_OS2026_1.pkl'
-        case "OS2026_2":
+        case 'OS2026_1a':
+            pkl_filename = 'df_MUR_SST_OS2026_1a.pkl'
+        case 'OS2026_1b':
+            pkl_filename = 'df_MUR_SST_OS2026_1b.pkl'
+        case 'OS2026_2':
             pkl_filename = 'df_MUR_SST_OS2026_2.pkl'
+        case 'OS2026_4':
+            pkl_filename = 'df_MUR_SST_OS2026_4.pkl'
     #endmatch
     
     return pkl_filename

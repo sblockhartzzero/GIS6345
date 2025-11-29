@@ -46,12 +46,18 @@ import os2026_functions
 env_data_src  = 'MUR'
 
 # Specify scenario (which ultimately determines which pickle file to use for MUR SST)
-# Could be 'GIS6345' or 'OS2026_1' to 'OS2026_4'
-env_scenario = 'OS2026_1'
+# Could be 'GIS6345' or 'OS2026_1a','OS2026_1b' to 'OS2026_4'
+env_scenario = 'OS2026_1b'
 
 # Specify scenario (which defines time frame as well as input data file)
 match env_scenario:
     case 'OS2026_1':
+        start_datetime = datetime(2015,1,15)  
+        num_days = 70
+    case 'OS2026_1a':
+        start_datetime = datetime(2015,1,15)  
+        num_days = 30
+    case 'OS2026_1b':
         start_datetime = datetime(2015,2,15)  
         num_days = 40
     case 'OS2026_2':
@@ -59,7 +65,10 @@ match env_scenario:
         num_days = 40
     case 'OS2026_3':
         start_datetime = datetime(2018,2,15)  
-        num_days = 40        
+        num_days = 40 
+    case 'OS2026_4':
+        start_datetime = datetime(2018,12,1)  
+        num_days = 119    
 #endmatch
 
 # Specify temperature range in F (to define the western edge of Gulf Stream)
@@ -189,14 +198,47 @@ animation = camera.animate(interval=120)
 mp4_filename = env_scenario + '_HP.mp4' 
 animation.save(mp4_filename) 
 
-# Plot distance_to_boundary_km
+# Plot distance_to_boundary_km and bearing_to_boundary_degrees on same plot
+# See example at https://matplotlib.org/stable/gallery/subplots_axes_and_figures/two_scales.html
 fig4, ax4 = plt.subplots()
+
+color = 'tab:red'
+ax4.plot(timestamp_datetime_array, distance_to_boundary_km, color=color)
+ax4.tick_params(axis='y', labelcolor=color)
+
+ax4a = ax4.twinx()  # instantiate a second Axes that shares the same x-axis
+
+color = 'tab:blue'
+ax4a.plot(timestamp_datetime_array, bearing_to_boundary_degrees, color=color)
+plt.show()
+
+# Try quiver time series
+fig5, ax5 = plt.subplots()
+
+u_values = distance_to_boundary_km*np.cos(bearing_to_boundary_degrees*np.pi/180)
+v_values = distance_to_boundary_km*np.sin(bearing_to_boundary_degrees*np.pi/180)
+print(v_values.max())
+y_positions = np.zeros(num_frames)
+
+ax5.quiver(timestamp_datetime_array,y_positions,u_values,v_values,
+           color='blue',width=.005,scale=1000,scale_units='y')
+plt.show()
+
+
+"""
 ax4.plot(distance_to_boundary_km)
 plt.show()
 fig5, ax5 = plt.subplots()
 ax5.plot(bearing_to_boundary_degrees)
 plt.show()
 print(distance_to_boundary_km)
+
+# Save distance_to_boundary_km, bearing_to_boundary_degrees, and timestamp_datetime_array
+# to pickle file
+distance_to_boundary_km.to_pickle('distance_'+env_scenario+'.pkl')
+bearing_to_boundary_degrees.to_pickle('bearing_'+env_scenario+'.pkl')
+timestamp_datetime_array.to_pickle('datetime_'+env_scenario+'.pkl')
+"""
  
 
 

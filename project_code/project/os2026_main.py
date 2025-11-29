@@ -38,12 +38,18 @@ import os2026_functions
 env_data_src  = 'MUR'
 
 # Specify scenario (which ultimately determines which pickle file to use for MUR SST)
-# Could be 'GIS6345' or 'OS2026_1' to 'OS2026_4'
-env_scenario = 'OS2026_2'
+# Could be 'GIS6345' or 'OS2026_1a','OS2026_1b' to 'OS2026_4'
+env_scenario = 'OS2026_1a'
 
 # Specify scenario (which defines time frame as well as input data file)
 match env_scenario:
     case 'OS2026_1':
+        start_datetime = datetime(2015,1,15)  
+        num_days = 70
+    case 'OS2026_1a':
+        start_datetime = datetime(2015,1,15)  
+        num_days = 30
+    case 'OS2026_1b':
         start_datetime = datetime(2015,2,15)  
         num_days = 40
     case 'OS2026_2':
@@ -51,7 +57,10 @@ match env_scenario:
         num_days = 40
     case 'OS2026_3':
         start_datetime = datetime(2018,2,15)  
-        num_days = 40        
+        num_days = 40
+    case 'OS2026_4':
+        start_datetime = datetime(2018,12,1)  
+        num_days = 119         
 #endmatch
 
 #===========CREATE ARRAY OF DATETIMES========================================================
